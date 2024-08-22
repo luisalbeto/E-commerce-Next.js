@@ -40,7 +40,7 @@ async function main() {
     // Imágenes
     const imagesData = images.map((image) => ({
       url: image,
-      productId: dbProduct.id,
+      ProductId: dbProduct.id,
     }));
 
     await prisma.productImage.createMany({

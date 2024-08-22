@@ -15,7 +15,7 @@ const productsInCart = [
 ];
 
 
-export default function () {
+export default function CheckoutPage() {
 
 
   // redirect('/empty');
@@ -120,7 +120,7 @@ export default function () {
               
               <p className='mb-5'>{/*Disclairmer*/}
                 <span className='text-xs'>
-                  Al Hacer click en "Colocar orden", aceptas nuestros <a href="#" className="underline">términos y condiciones</a> y <a href="#" className="underline">política de privacidad</a>
+                  Al Hacer click en &quot;Colocar orden&quot;, aceptas nuestros <a href="#" className="underline">términos y condiciones</a> y <a href="#" className="underline">política de privacidad</a>
                 </span>
               </p>
 
