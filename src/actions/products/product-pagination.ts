@@ -45,7 +45,7 @@ export const getPaginationWithImages = async({
       },
     })
 
-    const totalPages = Math.ceil( totalCount /take)
+    const totalPages = Math.ceil( totalCount / take)
 
 
 
