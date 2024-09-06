@@ -70,11 +70,9 @@ model ProductImage {
 model User {
   id            String    @id @default(uuid())
   name          String
-  lastName      String
-  userName      String    @unique
   email         String    @unique
   emailVerified DateTime?
   password      String
-  role          Role
+  role          Role      @default(user)
   image         String?
 }
