@@ -22,7 +22,8 @@ export async function authenticate(
 
     console.log(error)
 
-    
+
     return 'CredentialsSignin'
   }
 }
+
