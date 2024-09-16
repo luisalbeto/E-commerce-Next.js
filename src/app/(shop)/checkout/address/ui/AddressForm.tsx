@@ -1,7 +1,12 @@
 'use client'
 
+import { deleteUserAddress, setUserAddress } from "@/actions";
+import type { Address, Country } from "@/interfaces";
+import { useAddressStore } from "@/store";
 import clsx from "clsx";
-import Link from "next/link"
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form"
 
 
@@ -18,18 +23,51 @@ type FormInputs = {
 
 }
 
+interface Props {
+  countries: Country[]
+  userStoreAddress?: Partial<Address>
+
+}
 
 
-export const AddressForm = () => {
 
-  const {handleSubmit, register, formState: {isValid} } = useForm<FormInputs>({
+export const AddressForm = ({ countries, userStoreAddress = {} }: Props) => {
+
+  const router = useRouter()
+
+  const {handleSubmit, register, formState: {isValid}, reset } = useForm<FormInputs>({
     defaultValues: {
-      //Todo: read from database
+      ...(userStoreAddress as any),
+      rememberAddress: false
     }
   })
 
-  const onSubmit = (data : FormInputs) => {
-    console.log({data})
+  const { data: session } = useSession({
+    required: true
+  })
+
+  const setAddress = useAddressStore(state => state.setAddress)
+  const address = useAddressStore(state => state.address)
+
+  useEffect(() => {
+    if( address.firstName){
+      reset(address)
+    }
+  },[])
+
+
+  const onSubmit = async (data : FormInputs) => {
+
+   setAddress(data)
+    const { rememberAddress, ...restAddress} = data
+
+    if(rememberAddress){
+     await setUserAddress(restAddress, session!.user.id)
+    }else{
+     await deleteUserAddress(session!.user.id)
+    }
+
+    router.push('/checkout')
   }
 
 
@@ -93,7 +131,13 @@ export const AddressForm = () => {
     className="p-2 border rounded-md bg-gray-200" { ...register('country', {required: true})}
   >
     <option value="">[ Seleccione ]</option>
-    <option value="CRI">Costa Rica</option>
+    {
+      countries.map( country => (
+        <option key={country.id} value={country.id}>{country.name}</option>
+
+
+      ))
+    }
   </select>
 </div>
 
@@ -143,7 +187,6 @@ export const AddressForm = () => {
 </div>
 
   <button 
-    //href='/checkout'
     disabled={!isValid}
     type="submit"
     className={clsx({
