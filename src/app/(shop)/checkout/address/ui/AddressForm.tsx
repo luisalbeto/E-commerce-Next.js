@@ -33,6 +33,7 @@ interface Props {
 
 export const AddressForm = ({ countries, userStoreAddress = {} }: Props) => {
 
+
   const router = useRouter()
 
   const {handleSubmit, register, formState: {isValid}, reset } = useForm<FormInputs>({
@@ -47,7 +48,7 @@ export const AddressForm = ({ countries, userStoreAddress = {} }: Props) => {
   })
 
   const setAddress = useAddressStore(state => state.setAddress)
-  const address = useAddressStore(state => state.address)
+  const address = useAddressStore(state => state.shippingAddress)
 
   useEffect(() => {
     if( address.firstName){
@@ -58,8 +59,9 @@ export const AddressForm = ({ countries, userStoreAddress = {} }: Props) => {
 
   const onSubmit = async (data : FormInputs) => {
 
-   setAddress(data)
     const { rememberAddress, ...restAddress} = data
+    setAddress(restAddress)
+
 
     if(rememberAddress){
      await setUserAddress(restAddress, session!.user.id)
