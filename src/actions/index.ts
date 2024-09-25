@@ -3,6 +3,8 @@ export * from './auth/login'
 export * from './auth/logout'
 export * from './auth/register'
 
+export * from './category/get-category'
+
 export * from './country/get-countries'
 export * from './address/set-user-address'
 export * from './address/delete-user-address'
@@ -17,6 +19,7 @@ export * from './payments/set-transaction-id'
 export * from './payments/paypal-check-payment'
 
 export * from './user/get-paginated-users'
+export * from './user/change-user-role'
 
 export * from './products/product-pagination'
 export * from './products/get-stock-by-slug'

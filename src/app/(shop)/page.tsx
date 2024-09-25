@@ -7,17 +7,13 @@ import { Pagination, ProductGrid, Title } from "@/components";
 import { redirect } from "next/navigation";
 
 interface Props {
-  params:{
-    gender: string
-  },
   searchParams: {
     page?: string
   }
 }
 
-export default async function Home({ params ,searchParams }: Props) {
+export default async function Home({ searchParams }: Props) {
 
-  const { gender } = params
 
   const page = searchParams.page ? parseInt(searchParams.page) : 1
 
