@@ -5,8 +5,8 @@ export interface PayPalOrderStatusResponse {
     payment_source: PaymentSource;
     purchase_units: PurchaseUnit[];
     payer:          Payer;
-    create_time:    Date;
-    update_time:    Date;
+    create_time:    string
+    update_time:    string;
     links:          Link[];
 }
 
@@ -20,6 +20,7 @@ export interface Payer {
     name:          PayerName;
     email_address: string;
     payer_id:      string;
+    phone:         Phone;
     address:       PayerAddress;
 }
 
@@ -32,6 +33,14 @@ export interface PayerName {
     surname:    string;
 }
 
+export interface Phone {
+    phone_number: PhoneNumber;
+}
+
+export interface PhoneNumber {
+    national_number: string;
+}
+
 export interface PaymentSource {
     paypal: Paypal;
 }
@@ -41,7 +50,33 @@ export interface Paypal {
     account_id:     string;
     account_status: string;
     name:           PayerName;
+    phone_number:   PhoneNumber;
     address:        PayerAddress;
+    attributes:     Attributes;
+}
+
+export interface Attributes {
+    cobranded_cards: CobrandedCard[];
+}
+
+export interface CobrandedCard {
+    labels: any[];
+    payee:  Payee;
+    amount: Discount;
+}
+
+export interface Discount {
+    currency_code: CurrencyCode;
+    value:         string;
+}
+
+export enum CurrencyCode {
+    Usd = "USD",
+}
+
+export interface Payee {
+    email_address: string;
+    merchant_id:   string;
 }
 
 export interface PurchaseUnit {
@@ -50,16 +85,22 @@ export interface PurchaseUnit {
     payee:        Payee;
     shipping:     Shipping;
     payments:     Payments;
+    invoice_id:   string;
 }
 
 export interface Amount {
-    currency_code: string;
+    currency_code: CurrencyCode;
     value:         string;
+    breakdown:     Breakdown;
 }
 
-export interface Payee {
-    email_address: string;
-    merchant_id:   string;
+export interface Breakdown {
+    item_total:        Discount;
+    shipping:          Discount;
+    handling:          Discount;
+    insurance:         Discount;
+    shipping_discount: Discount;
+    discount:          Discount;
 }
 
 export interface Payments {
@@ -69,7 +110,7 @@ export interface Payments {
 export interface Capture {
     id:                          string;
     status:                      string;
-    amount:                      Amount;
+    amount:                      Discount;
     final_capture:               boolean;
     seller_protection:           SellerProtection;
     seller_receivable_breakdown: SellerReceivableBreakdown;
@@ -84,9 +125,9 @@ export interface SellerProtection {
 }
 
 export interface SellerReceivableBreakdown {
-    gross_amount: Amount;
-    paypal_fee:   Amount;
-    net_amount:   Amount;
+    gross_amount: Discount;
+    paypal_fee:   Discount;
+    net_amount:   Discount;
 }
 
 export interface Shipping {

@@ -1,10 +1,5 @@
-
 import Image from 'next/image';
-
-
-import { PayPalButton, Title } from '@/components';
-import clsx from 'clsx';
-import { IoCardOutline } from 'react-icons/io5';
+import { OrderStatus, PayPalButton, Title } from '@/components';
 import { getOrderById } from '@/actions';
 import { redirect } from 'next/navigation';
 import { currencyFormat } from '@/utils';
@@ -39,27 +34,7 @@ export default async function OrdersByIdPage({ params }: Props) {
 
           {/* Carrito */}
           <div className="flex flex-col mt-5">
-            <div className={
-              clsx(
-                "flex items-center rounded-lg px-3.5 text-xs font-bold text-white mb-5",
-                {
-                  'bg-red-500': !order!.isPaid,
-                  'bg-green-700': order!.isPaid
-                }
-              )
-            }>
-              <IoCardOutline size={30} />
-              {/*<span className='mx-2'>Pendiente de pago</span> */}
-              <span className='mx-2'>
-                {
-                  order?.isPaid ? 'Pagada' : 'No Pagada'
-                }
-              </span>
-
-            </div>
-
-
-
+            <OrderStatus isPaid={order?.isPaid ?? false} />
             {/* Items */}
             {
               order!.OrderItem.map(item => (
@@ -90,10 +65,6 @@ export default async function OrdersByIdPage({ params }: Props) {
               ))
             }
           </div>
-
-
-
-
           {/* Checkout - Resumen de orden */}
           <div className="bg-white rounded-xl shadow-xl p-7 h-fit">
 
@@ -110,10 +81,6 @@ export default async function OrdersByIdPage({ params }: Props) {
             {/*divider*/}
 
             <div className='w-full h-0.5 rounded bg-gray-200 mb-10' />
-
-
-
-
 
             <h2 className="text-2xl mb-2">Resumen de orden</h2>
 
@@ -135,12 +102,11 @@ export default async function OrdersByIdPage({ params }: Props) {
             </div>
 
             <div className="mt-5 mb-2 w-full">
-            
-            <PayPalButton
-              amount={ order!.total }
-              orderId={ order!.id }
-            />
-
+              {order?.isPaid ? (
+                <OrderStatus isPaid={order?.isPaid ?? false} />
+              ) : (
+                <PayPalButton amount={order!.total} orderId={order!.id}/>
+              )}
             </div>
           </div>
         </div>

@@ -1,6 +1,8 @@
 'use server'
 
 import { PayPalOrderStatusResponse } from "@/interfaces"
+import prisma from "@/lib/prisma"
+import { revalidatePath } from "next/cache"
 
 
 
@@ -26,7 +28,42 @@ export const paypalCheckPayment = async (paypalTransactionId: string) => {
 
   const { status, purchase_units } = resp
  // const { amount } = purchase_units[0]
-  console.log({ status, purchase_units })
+ const {invoice_id: orderId } = purchase_units[0] //invoice Id
+
+  if( status !== 'COMPLETED') {
+    return {
+      ok: false,
+      message: 'Aun no se ha pagado en PayPal'
+    }
+  }
+
+  try {
+    console.log({ status, purchase_units })
+
+    await prisma.order.update({
+      where: {id: orderId },
+      data: {
+        isPaid: true,
+        paidAt: new Date()
+      }
+    })
+
+    //Todo: Revalidar un path
+    revalidatePath(`/orders/${ orderId }`)
+
+    return {
+      ok: true
+    }
+
+  } catch (error) {
+    console.log(error)
+    return{
+      ok: false,
+      message: '500 - El pago no se pudo realizar'
+    }
+  }
+
+
 }
 
 const getPayPalBearerToken = async (): Promise<string | null> => {
@@ -36,7 +73,7 @@ const getPayPalBearerToken = async (): Promise<string | null> => {
   const oauth2Url = process.env.PAYPAL_OAUTH_URL ?? ''
 
   const base64Token = Buffer.from(
-    `${PAYPAL_CLIENT_ID}:${PAYPAL_SECRET}`,
+    `${ PAYPAL_CLIENT_ID }:${ PAYPAL_SECRET }`,
     'utf-8'
   ).toString('base64')
 
@@ -56,7 +93,10 @@ const getPayPalBearerToken = async (): Promise<string | null> => {
   };
 
   try {
-    const result = await fetch(oauth2Url, requestOptions).then(r => r.json())
+    const result = await fetch(oauth2Url, {
+      ...requestOptions,
+      cache: 'no-store'
+    }).then(r => r.json())
     return result.access_token
 
   } catch (error) {
@@ -75,7 +115,8 @@ const verifyPayPalPayment = async (
   const myHeaders = new Headers();
   myHeaders.append(
     "Authorization", 
-    `Bearer ${ bearerToken }`);
+    `Bearer ${ bearerToken }`
+  );
 
   const requestOptions = {
     method: "GET",
@@ -83,7 +124,12 @@ const verifyPayPalPayment = async (
   };
 
   try {
-    const resp = await fetch(paypalOrderUrl, requestOptions).then( r => r.json())
+    const resp = await fetch(paypalOrderUrl,{
+      ...requestOptions,
+      cache: 'no-store'
+    }).then( r => r.json())
+    console.log({resp})
+    return resp
 
   } catch (error) {
     console.log(error)

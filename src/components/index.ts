@@ -5,6 +5,8 @@ export * from './products/product-grid/ProductGridItem'
 
 export * from './paypal/PayPalButton'
 
+export * from './orders/OrderStatus'
+
 export * from './providers/Providers'
 
 export * from './product/slideshow/ProductSlideshow'
